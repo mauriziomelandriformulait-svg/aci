@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piattaforma Finanza & Operations PA | Ciclo Passivo ICT & PRA/PagoPA</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0f2138',
+                            900: '#0b192c',
+                            950: '#060f1c'
+                        },
+                        brand: {
+                            blue: '#0284c7',
+                            emerald: '#059669',
+                            amber: '#d97706',
+                            purple: '#7c3aed'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b192c; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-hover:hover {
+            border-color: rgba(2, 132, 199, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        .step-active {
+            border-color: #0284c7;
+            background-color: rgba(2, 132, 199, 0.15);
+            color: #38bdf8;
+        }
+        .step-completed {
+            border-color: #059669;
+            background-color: rgba(5, 150, 105, 0.15);
+            color: #34d399;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased text-slate-200 bg-slate-950">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-navy-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-tr from-sky-600 to-emerald-500 p-2.5 rounded-xl shadow-lg shadow-sky-900/30">
+                        <i class="fa-solid me-0 fa-landmark text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-lg text-white tracking-wide">GovFinance <span class="text-sky-400 font-normal">ICT & Operations</span></span>
+                            <span class="bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px] font-semibold px-2 py-0.5 rounded-full">v4.2 Enterprise</span>
+                        </div>
+                        <p class="text-xs text-slate-400 hidden sm:block">Piattaforma Integrata Ciclo Passivo ICT & Ciclo Attivo PagoPA/PRA</p>
+                    </div>
+                </div>
+
+                <!-- Main Module Switcher Tabs -->
+                <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60">
+                    <button id="tab-passivo-btn" onclick="switchModule('passivo')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-sky-600 text-white shadow-md">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span class="hidden md:inline">Flusso 1:</span> Ciclo Passivo ICT
+                    </button>
+                    <button id="tab-attivo-btn" onclick="switchModule('attivo')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 transition-all duration-200">
+                        <i class="fa-solid fa-building-columns"></i>
+                        <span class="hidden md:inline">Flusso 2:</span> Ciclo Attivo PRA & PagoPA
+                    </button>
+                </div>
+
+                <!-- Right Quick System Info -->
+                <div class="hidden lg:flex items-center space-x-4 text-xs text-slate-400">
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Nodo PagoPA: <strong class="text-emerald-400">ONLINE</strong></span>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>PCC / SIOPE+: <strong class="text-emerald-400">CONNESSO</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ========================================================================= -->
+        <!-- MODULE 1: FLUSSO CICLO PASSIVO ICT -->
+        <!-- ========================================================================= -->
+        <div id="module-passivo" class="space-y-6">
+
+            <!-- Header Banner with Simulation trigger -->
+            <div class="glass-card rounded-2xl p-6 relative overflow-hidden border-l-4 border-sky-500">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-sky-400">
+                    <i class="fa-solid fa-microchip text-9xl"></i>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs uppercase tracking-wider text-sky-400 font-semibold">Ciclo Passivo Acquisti & Contatti Tecnologici</span>
+                            <span class="bg-emerald-500/20 text-emerald-300 text-[11px] px-2 py-0.5 rounded-full font-mono border border-emerald-500/30">AgID / BTP Compliant</span>
+                        </div>
+                        <h1 class="text-2xl font-bold text-white mt-1">Gestione e Controllo Contratte/SAL/Fatture ICT</h1>
+                        <p class="text-slate-400 text-sm mt-1 max-w-3xl">
+                            Tracciabilità end-to-end dal contratto di fornitura ICT (CIG/CUP) fino all'imputazione costi di progetto e monitoraggio budget forecast.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button id="btn-simula-passivo" onclick="runPassivoSimulation()" class="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-sky-900/40 flex items-center space-x-2 transition-all transform active:scale-95">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Simula Flusso Completo ICT</span>
+                        </button>
+                        <button onclick="resetPassivoState()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3.5 py-2.5 rounded-xl transition">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Simulation Progress Bar (Hidden by default) -->
+                <div id="sim-passivo-progress-container" class="mt-4 hidden space-y-1.5">
+                    <div class="flex justify-between text-xs">
+                        <span id="sim-passivo-status-text" class="text-sky-300 font-mono">Inizio simulazione...</span>
+                        <span id="sim-passivo-percentage" class="text-slate-400 font-mono">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+                        <div id="sim-passivo-bar" class="bg-gradient-to-r from-sky-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pipeline Stepper (7 Stages) -->
+            <div class="glass-card rounded-2xl p-4">
+                <p class="text-xs text-slate-400 font-medium mb-3 px-2 uppercase tracking-wider">Fasi del Processo Contabile ICT:</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2" id="passivo-stepper">
+                    
+                    <!-- Step 1 -->
+                    <button onclick="selectPassivoStep(1)" id="pstep-1" class="step-active flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">01</span>
+                            <i class="fa-solid fa-file-contract text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">1. Contratto ICT</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">CIG / CUP / Lotto</span>
+                    </button>
+
+                    <!-- Step 2 -->
+                    <button onclick="selectPassivoStep(2)" id="pstep-2" class="border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">02</span>
+                            <i class="fa-solid fa-clipboard-check text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">2. Ordine / SAL</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">Attestazione DEC</span>
+                    </button>
+
+                    <!-- Step 3 -->
+                    <button onclick="selectPassivoStep(3)" id="pstep-3" class="border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">03</span>
+                            <i class="fa-solid fa-receipt text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">3. Fattura Elec.</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">SDI / PCC IPA</span>
+                    </button>
+
+                    <!-- Step 4 -->
+                    <button onclick="selectPassivoStep(4)" id="pstep-4" class="border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">04</span>
+                            <i class="fa-solid fa-book text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">4. Contabilizzazione</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">Impegno & Visto</span>
+                    </button>
+
+                    <!-- Step 5 -->
+                    <button onclick="selectPassivoStep(5)" id="pstep-5" class="border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">05</span>
+                            <i class="fa-solid fa-money-bill-transfer text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">5. Pagamento</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">OPI / SIOPE+ / PCC</span>
+                    </button>
+
+                    <!-- Step 6 -->
+                    <button onclick="selectPassivoStep(6)" id="pstep-6" class="border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">06</span>
+                            <i class="fa-solid fa-diagram-project text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">6. Imputazione Costo</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">Cost Center / Capex</span>
+                    </button>
+
+                    <!-- Step 7 -->
+                    <button onclick="selectPassivoStep(7)" id="pstep-7" class="border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-mono font-bold text-slate-400">07</span>
+                            <i class="fa-solid fa-chart-line text-sm"></i>
+                        </div>
+                        <span class="text-xs font-semibold truncate">7. Budget & Forecast</span>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">Burn-rate & Variance</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Main Content Area: Step Details & Interactive Panel + Budget Sidebar Widget -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left 2 Cols: Step View & Actions -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <div class="glass-card rounded-2xl p-6 min-h-[420px] flex flex-col justify-between" id="passivo-stage-container">
+                        
+                        <!-- Content dynamically loaded via JS -->
+                        <div id="passivo-stage-content">
+                            <!-- Default Stage 1 Content -->
+                        </div>
+
+                        <!-- Stage Footer / Action Button -->
+                        <div class="pt-6 border-t border-slate-800 flex items-center justify-between mt-6">
+                            <div class="text-xs text-slate-400 flex items-center space-x-2">
+                                <i class="fa-solid fa-circle-info text-sky-400"></i>
+                                <span id="passivo-stage-note">Fase 1/7: Registrazione dati negoziali originari.</span>
+                            </div>
+
+                            <div class="flex space-x-3">
+                                <button id="btn-passivo-prev" onclick="navigatePassivo(-1)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition disabled:opacity-40" disabled>
+                                    <i class="fa-solid fa-arrow-left mr-1.5"></i> Precedente
+                                </button>
+                                <button id="btn-passivo-next" onclick="navigatePassivo(1)" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium transition flex items-center">
+                                    <span>Successivo</span> <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Live Audit Trail Log for Passivo -->
+                    <div class="glass-card rounded-2xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-sky-400"></i>
+                                <span>Audit Trail & Tracciabilità PCC/SIOPE+ (Real-time)</span>
+                            </h3>
+                            <span class="text-[10px] text-slate-500 font-mono">LOG_ID: #ICT-2026-8829</span>
+                        </div>
+                        <div id="passivo-audit-log" class="bg-slate-950 rounded-xl p-3 h-36 overflow-y-auto font-mono text-xs space-y-1.5 border border-slate-800/80">
+                            <div class="text-slate-500">[11:00:12] SYSTEM: Inizializzazione sessione di monitoraggio acquisti ICT...</div>
+                            <div class="text-sky-400">[11:02:45] CONTRATTO: CIG 9823741AB4 collegato a CUP F89J23000120001. Importo € 450.000,00</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right 1 Col: Real-Time Budget Impact Widget -->
+                <div class="space-y-6">
+                    <div class="glass-card rounded-2xl p-6 border-t-2 border-sky-400">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-chart-pie text-sky-400"></i>
+                                <span>Budget Impact ICT</span>
+                            </h3>
+                            <span class="bg-sky-500/10 text-sky-400 text-[10px] px-2 py-0.5 rounded font-mono">Cap. 1042/2026</span>
+                        </div>
+
+                        <!-- Mini KPIs -->
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Budget Stanziato</span>
+                                <div class="text-base font-bold text-white mt-0.5">€ 1.200.000</div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Impegnato Totale</span>
+                                <div class="text-base font-bold text-sky-400 mt-0.5" id="kpi-budget-impegnato">€ 450.000</div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Liquidato (OPI)</span>
+                                <div class="text-base font-bold text-emerald-400 mt-0.5" id="kpi-budget-liquidato">€ 0</div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Forecast Rimanente</span>
+                                <div class="text-base font-bold text-amber-400 mt-0.5" id="kpi-budget-disponibile">€ 750.000</div>
+                            </div>
+                        </div>
+
+                        <!-- Budget Chart -->
+                        <div class="relative h-48 w-full">
+                            <canvas id="budgetChart"></canvas>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-800 text-xs space-y-2">
+                            <div class="flex justify-between items-center text-slate-400">
+                                <span>Stato Copertura Finanziaria:</span>
+                                <span class="text-emerald-400 font-semibold flex items-center">
+                                    <i class="fa-solid fa-check-circle mr-1"></i> Regolare 100%
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center text-slate-400">
+                                <span>Tempo Medio Pagamento PCC:</span>
+                                <span class="text-slate-200 font-mono">18 giorni (Target <30)</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Quick XML Document Inspector Button -->
+                    <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                <i class="fa-solid fa-code text-lg"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-semibold text-white">Ispeziona Tracciato XML</h4>
+                                <p class="text-[10px] text-slate-400">Visualizza payload FatturaPA / OPI SIOPE+</p>
+                            </div>
+                        </div>
+                        <button onclick="openXmlModal('passivo')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-purple-300 font-medium border border-purple-500/30 transition">
+                            Apri XML
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- MODULE 2: FLUSSO CICLO ATTIVO PRA & PAGOPA -->
+        <!-- ========================================================================= -->
+        <div id="module-attivo" class="space-y-6 hidden">
+
+            <!-- Header Banner with Guided Demo trigger -->
+            <div class="glass-card rounded-2xl p-6 relative overflow-hidden border-l-4 border-emerald-500">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-emerald-400">
+                    <i class="fa-solid fa-building-columns text-9xl"></i>
+                </div>
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 relative z-10">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs uppercase tracking-wider text-emerald-400 font-semibold">Ciclo Attivo, Riconciliazione & Riversamenti</span>
+                            <span class="bg-sky-500/20 text-sky-300 text-[11px] px-2 py-0.5 rounded-full font-mono border border-sky-500/30">SIOPE+ & PagoPA Engine</span>
+                        </div>
+                        <h1 class="text-2xl font-bold text-white mt-1">Gestione Entrate PRA & Nodo PagoPA</h1>
+                        <p class="text-slate-400 text-sm mt-1 max-w-3xl">
+                            Riconciliazione automatica Flussi di Rendicontazione IUV, Matching Sospesi di Cassa, Calcolo Diritti PRA/Bollo e Generazione Flussi OPI di Riversamento.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button id="btn-demo-attivo" onclick="startPagoPADemo()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-900/40 flex items-center space-x-2 transition-all transform active:scale-95">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>Avvia Demo Guidata 5 Minuti PRA/PagoPA</span>
+                        </button>
+                        <button onclick="resetAttivoState()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3.5 py-2.5 rounded-xl transition">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PagoPA Demo Step Banner (Hidden by default) -->
+                <div id="demo-attivo-banner" class="mt-4 p-3 bg-emerald-950/60 border border-emerald-500/30 rounded-xl hidden flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></div>
+                        <span id="demo-attivo-step-text" class="text-xs text-emerald-200 font-medium">Demo in corso: Importazione Flusso Rendicontazione XML...</span>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 font-mono bg-emerald-900/50 px-2 py-1 rounded">FASE <span id="demo-attivo-step-num">1</span>/3</span>
+                </div>
+            </div>
+
+            <!-- Operational Pipeline Tabs for Actives -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="glass-card p-4 rounded-xl border-l-2 border-emerald-500">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-mono">FASE A</span>
+                        <i class="fa-solid fa-receipt text-emerald-400"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mt-1">1. Flussi PagoPA / RT</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Ricezione Ricevute Tematiche XML & Avvisi IUV</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl border-l-2 border-sky-500">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-mono">FASE B</span>
+                        <i class="fa-solid fa-scale-balanced text-sky-400"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mt-1">2. Riconciliazione Cassa</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Matching IUV con Sospesi SIOPE+</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl border-l-2 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-slate-400 font-mono">FASE C</span>
+                        <i class="fa-solid fa-arrows-split-up-and-left text-purple-400"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white mt-1">3. Ripartizione & Riversamento</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Scissione Spettanze & Distinta OPI</p>
+                </div>
+            </div>
+
+            <!-- Main Content Area: Reconciliation Engine & Split Matrix -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left 2 Cols: Table & Matching Engine -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Interactive Ledger Table -->
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                                    <i class="fa-solid fa-table-list text-emerald-400"></i>
+                                    <span>Giornale Sospesi e Flussi RT PagoPA</span>
+                                </h3>
+                                <p class="text-xs text-slate-400">Esito abbinamento automatico codice IUV <-> Provvisorio di Entrata</p>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                <div class="relative">
+                                    <input type="text" id="pagopa-search" onkeyup="filterPagoPATable()" placeholder="Cerca IUV o Cod. Fiscale..." class="bg-slate-900 border border-slate-700 text-xs rounded-xl pl-8 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 w-44 sm:w-56">
+                                    <i class="fa-solid fa-search text-xs text-slate-500 absolute left-2.5 top-2.5"></i>
+                                </div>
+                                <button onclick="runAutoReconciliation()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-xl shadow transition flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-bolt"></i>
+                                    <span class="hidden sm:inline">Riconcilia Tutti</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Data Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-slate-400 uppercase font-mono text-[10px] bg-slate-900/50">
+                                        <th class="py-2.5 px-3">IUV / Transazione</th>
+                                        <th class="py-2.5 px-3">Causale PRA / Ente</th>
+                                        <th class="py-2.5 px-3 text-right">Importo</th>
+                                        <th class="py-2.5 px-3">Sospeso Cassa</th>
+                                        <th class="py-2.5 px-3">Stato Matching</th>
+                                        <th class="py-2.5 px-3 text-center">Azione</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pagopa-table-body" class="divide-y divide-slate-800/60 font-sans">
+                                    <!-- Table Rows Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Table Footer Summary -->
+                        <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-2">
+                            <div>Totale Disponibile per Riversamento: <strong class="text-white font-mono" id="total-reconciled-amount">€ 100.000,00</strong></div>
+                            <div class="flex items-center space-x-3">
+                                <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span> Riconciliato (4)</span>
+                                <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span> Anomalia (1)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Split & Payout Distribution Engine -->
+                    <div class="glass-card rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                                    <i class="fa-solid fa-diagram-nested text-purple-400"></i>
+                                    <span>Matrice di Ripartizione & Riversamento Automatica</span>
+                                </h3>
+                                <p class="text-xs text-slate-400">Algoritmo di scorporo Diritti PRA, Imposta di Bollo, Tributo Provinciale e Quota Ente</p>
+                            </div>
+                            <button onclick="generateDistintaRiversamento()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-purple-900/30 transition flex items-center space-x-2">
+                                <i class="fa-solid fa-file-export"></i>
+                                <span>Genera Distinta OPI</span>
+                            </button>
+                        </div>
+
+                        <!-- Split Breakdown Cards -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-purple-500/20">
+                                <span class="text-[10px] text-slate-400 uppercase">Quota ACI / PRA</span>
+                                <div class="text-sm font-bold text-purple-300 mt-1" id="split-pra">€ 27.000 (27%)</div>
+                                <span class="text-[9px] text-slate-500">Diritti di Inserzione</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-blue-500/20">
+                                <span class="text-[10px] text-slate-400 uppercase">Erario (Imposta Bollo)</span>
+                                <div class="text-sm font-bold text-blue-300 mt-1" id="split-erario">€ 32.000 (32%)</div>
+                                <span class="text-[9px] text-slate-500">DPR 642/72</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-emerald-500/20">
+                                <span class="text-[10px] text-slate-400 uppercase">Provincia / Città Metr.</span>
+                                <div class="text-sm font-bold text-emerald-300 mt-1" id="split-provincia">€ 25.000 (25%)</div>
+                                <span class="text-[9px] text-slate-500">IPT Quota Territoriale</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-amber-500/20">
+                                <span class="text-[10px] text-slate-400 uppercase">Netto Spettanza Ente</span>
+                                <div class="text-sm font-bold text-amber-300 mt-1" id="split-ente">€ 16.000 (16%)</div>
+                                <span class="text-[9px] text-slate-500">Fondo Servizio ICT</span>
+                            </div>
+                        </div>
+
+                        <!-- Split Visualization Chart -->
+                        <div class="relative h-44 w-full">
+                            <canvas id="splitChart"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right 1 Col: Summary & Audit Log -->
+                <div class="space-y-6">
+
+                    <!-- Certificate / Distinta Output Preview Widget -->
+                    <div class="glass-card rounded-2xl p-6 border-t-2 border-emerald-400">
+                        <h3 class="text-sm font-bold text-white mb-2 flex items-center space-x-2">
+                            <i class="fa-solid fa-file-certificate text-emerald-400"></i>
+                            <span>Prospetto Contabile Finale</span>
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-4">Riepilogo pronto per l'invio alla Banca Tesoriera via SIOPE+ OPI</p>
+
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-xs space-y-2.5 font-mono">
+                            <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                <span class="text-slate-500">N. Distinta:</span>
+                                <span class="text-emerald-400">DIST-PRA-2026-092</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                <span class="text-slate-500">Lotto PagoPA:</span>
+                                <span class="text-slate-300">FL-20261005-01</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-800 pb-1.5">
+                                <span class="text-slate-500">RT Riconciliate:</span>
+                                <span class="text-slate-300">1.240 RT</span>
+                            </div>
+                            <div class="flex justify-between font-bold pt-1">
+                                <span class="text-slate-300">Totale Riversato:</span>
+                                <span class="text-emerald-400 text-sm">€ 100.000,00</span>
+                            </div>
+                        </div>
+
+                        <button onclick="openXmlModal('attivo')" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-code"></i>
+                            <span>Visualizza XML Flusso Rendicontazione</span>
+                        </button>
+                    </div>
+
+                    <!-- Live Audit Trail Log for Attivo -->
+                    <div class="glass-card rounded-2xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
+                                <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i>
+                                <span>Event Stream PagoPA / SIOPE+</span>
+                            </h3>
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        </div>
+                        <div id="attivo-audit-log" class="bg-slate-950 rounded-xl p-3 h-48 overflow-y-auto font-mono text-xs space-y-1.5 border border-slate-800/80">
+                            <div class="text-slate-500">[11:04:01] NODO_PAGOPA: Ricevuto flusso XML RT_20261005_99812.xml</div>
+                            <div class="text-emerald-400">[11:04:02] RECONCILER: Match effettuato IUV 000000129384 -> Sospeso #99120</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- XML / DOCUMENT INSPECTOR MODAL -->
+    <div id="xml-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-card max-w-3xl w-full rounded-2xl overflow-hidden shadow-2xl border border-slate-700">
+            <div class="px-6 py-4 bg-navy-900 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-code text-sky-400"></i>
+                    <h3 class="font-bold text-white text-sm" id="xml-modal-title">Ispezione Payload XML Standard PA</h3>
+                </div>
+                <button onclick="closeXmlModal()" class="text-slate-400 hover:text-white text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-slate-400 font-mono" id="xml-modal-filename">FatturaPA_ICT_98237.xml</span>
+                    <button onclick="copyXmlContent()" class="text-xs text-sky-400 hover:text-sky-300 flex items-center space-x-1">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>Copia XML</span>
+                    </button>
+                </div>
+                <pre id="xml-modal-code" class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-emerald-400 overflow-x-auto max-h-96 border border-slate-800"></pre>
+            </div>
+            <div class="px-6 py-3 bg-slate-900/80 border-t border-slate-800 flex justify-end">
+                <button onclick="closeXmlModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl">
+                    Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL STATE & DATA
+        let currentModule = 'passivo';
+        let passivoCurrentStep = 1;
+        let budgetChartInstance = null;
+        let splitChartInstance = null;
+        let passivoSimTimer = null;
+        let attivoDemoTimer = null;
+
+        // Data Models
+        const passivoStepsData = {
+            1: {
+                title: "1. Contratto ICT e Impegno Originario",
+                badge: "Contratto N. ICT-2026-99",
+                content: `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Codice CIG</span>
+                                <div class="text-sm font-bold text-sky-400 font-mono mt-0.5">9823741AB4</div>
+                                <span class="text-[10px] text-slate-500">SIMOG / ANAC Validato</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Codice CUP</span>
+                                <div class="text-sm font-bold text-sky-400 font-mono mt-0.5">F89J23000120001</div>
+                                <span class="text-[10px] text-slate-500">PNRR Missione 1 Digitaliz.</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400 uppercase font-semibold">Importo Aggiudicato</span>
+                                <div class="text-sm font-bold text-emerald-400 font-mono mt-0.5">€ 450.000,00</div>
+                                <span class="text-[10px] text-slate-500">Valore Residuo: € 450.000,00</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Fornitore Aggiudicatario:</span>
+                                <span class="text-white font-semibold">TechGov Solutions S.p.A. (P.IVA 08234100912)</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Oggetto della Fornitura:</span>
+                                <span class="text-slate-300">Evoluzione Piattaforma Cloud & Integrazione PagoPA</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Durata Contratto:</span>
+                                <span class="text-slate-300">24 Mesi (Scadenza 31/12/2027)</span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                note: "Fase 1/7: Registrazione dati negoziali originari e verifica capienza capitolo bilancio."
+            },
+            2: {
+                title: "2. Ordine di Fornitura & Stato Avanzamento Lavori (SAL)",
+                badge: "SAL N. 01/2026",
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-sky-400 font-semibold uppercase">Attestazione Regolarità Prestazione</span>
+                                <h4 class="text-sm font-bold text-white mt-0.5">Verifica Conformità ICT - Collaudo Fase 1</h4>
+                                <p class="text-xs text-slate-400 mt-1">Verificatore ICT: Ing. Roberto Ferri (DEC designato)</p>
+                            </div>
+                            <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs px-3 py-1 rounded-full font-semibold">
+                                <i class="fa-solid fa-check mr-1"></i> APPROVATO
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400">Valore Lavori Attestati</span>
+                                <div class="text-base font-bold text-white font-mono mt-0.5">€ 150.000,00</div>
+                            </div>
+                            <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400">Documento In allegato</span>
+                                <div class="text-xs font-semibold text-sky-400 mt-1 cursor-pointer flex items-center"><i class="fa-solid fa-file-pdf mr-1"></i> Certificate_SAL_01.pdf</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                note: "Fase 2/7: Emissione del verbale di collaudo e attestazione prestazione da parte del DEC."
+            },
+            3: {
+                title: "3. Ricezione Fattura Elettronica (SDI / PCC Integration)",
+                badge: "FatturaPA #FE-2026-104",
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400">Codice Univoco IPA:</span>
+                                <span class="text-white font-mono font-semibold bg-slate-800 px-2 py-0.5 rounded">UF923A (Area ICT)</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400">Identificativo SDI:</span>
+                                <span class="text-slate-300 font-mono">SDI-99823411</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400">Importo Fatturato (Imponibile + IVA):</span>
+                                <span class="text-emerald-400 font-bold font-mono text-sm">€ 183.000,00</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400">Associazione CIG/CUP:</span>
+                                <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-link mr-1"></i> Automatico 100% Match</span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                note: "Fase 3/7: Ricezione tramite SDI, protocollazione e sincronizzazione con Piattaforma Crediti Commerciali."
+            },
+            4: {
+                title: "4. Contabilizzazione & Visto di Copertura Finanziaria",
+                badge: "Impegno N. 1042/2026",
+                content: `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400">Capitolo di Bilancio</span>
+                                <div class="text-sm font-bold text-white font-mono mt-0.5">Cap. 1042 - Spese ICT</div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400">Visto di Regolarità Contabile</span>
+                                <div class="text-sm font-bold text-emerald-400 mt-0.5"><i class="fa-solid fa-stamp mr-1"></i> Rilasciato</div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 text-xs text-slate-300">
+                            Fattura inserita nel giornale di contabilità finanziaria. Liquidazione contabile approvata dal dirigente finanziario.
+                        </div>
+                    </div>
+                `,
+                note: "Fase 4/7: Imputazione contabile e registrazione del debito su PCC."
+            },
+            5: {
+                title: "5. Pagamento mediante Mandato OPI / SIOPE+",
+                badge: "Mandato OPI #88291",
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Flusso OPI Generato:</span>
+                                <span class="text-sky-400 font-mono">OPI_2026_88291.xml</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Nodo SIOPE+ Bank:</span>
+                                <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-check-double mr-1"></i> Accettato da Banca d'Italia</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Aggiornamento PCC:</span>
+                                <span class="text-slate-300">Stato "PAGATO" Comunicato in Automatico</span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                note: "Fase 5/7: Trasmissione ordine di pagamento informatico alla Tesoreria tramite SIOPE+."
+            },
+            6: {
+                title: "6. Costo sul Progetto / Servizio ICT",
+                badge: "Centro di Costo: CC-ICT-30",
+                content: `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400">Anagrafica Progetto ICT</span>
+                                <div class="text-xs font-bold text-white mt-0.5">PRJ-PAGOPA-EVO</div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                                <span class="text-[10px] text-slate-400">Classificazione Spesa</span>
+                                <div class="text-xs font-bold text-amber-400 mt-0.5">CAPEX (Ammortamento 5 Anni)</div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-800 text-xs text-slate-300">
+                            Quota costo imputata alla matrice di servizio ICT dell'Ente per rendicontazione analitica e controllo di gestione.
+                        </div>
+                    </div>
+                `,
+                note: "Fase 6/7: Ripartizione del costo sul centro di responsabilità e ammortamento."
+            },
+            7: {
+                title: "7. Dashboard Budget & Forecast Dinamico",
+                badge: "Previsione a Finire OK",
+                content: `
+                    <div class="space-y-4">
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 space-y-3">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Burn-rate Attuale Capitolo:</span>
+                                <span class="text-sky-400 font-bold">37.5%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-sky-400 h-full w-[37.5%]"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-slate-400 pt-1">
+                                <span>Scostamento Actual vs Budget: <strong class="text-emerald-400">0.0% (In Target)</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                note: "Fase 7/7: Consolidamento degli indicatori di bilancio e aggiornamento previsioni a finire."
+            }
+        };
+
+        const pagopaRows = [
+            { id: "IUV-2026-009128", causale: "Diritti PRA - Trasferimento Proprietà", importo: 250.00, sospeso: "SOSP-99101", status: "Riconciliato", badgeClass: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
+            { id: "IUV-2026-009129", causale: "Imposta Bollo PRA - Prima Iscrizione", importo: 64.00, sospeso: "SOSP-99102", status: "Riconciliato", badgeClass: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
+            { id: "IUV-2026-009130", causale: "Tributo IPT Provincia - Immatricolazione", importo: 480.00, sospeso: "SOSP-99103", status: "Anomalia", badgeClass: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+            { id: "IUV-2026-009131", causale: "Diritti Visura PRA - Automatica", importo: 15.00, sospeso: "SOSP-99104", status: "Riconciliato", badgeClass: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
+            { id: "IUV-2026-009132", causale: "Diritti PRA - Rilascio DU", importo: 190.00, sospeso: "SOSP-99105", status: "Riconciliato", badgeClass: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" }
+        ];
+
+        // INITIALIZATION ON LOAD
+        window.onload = function() {
+            initBudgetChart();
+            initSplitChart();
+            renderPassivoStep(1);
+            renderPagoPATable();
+        };
+
+        // MODULE SWITCHING LOGIC
+        function switchModule(moduleName) {
+            currentModule = moduleName;
+            const passivoMod = document.getElementById('module-passivo');
+            const attivoMod = document.getElementById('module-attivo');
+            const passivoBtn = document.getElementById('tab-passivo-btn');
+            const attivoBtn = document.getElementById('tab-attivo-btn');
+
+            if (moduleName === 'passivo') {
+                passivoMod.classList.remove('hidden');
+                attivoMod.classList.add('hidden');
+                
+                passivoBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-sky-600 text-white shadow-md";
+                attivoBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 transition-all duration-200";
+            } else {
+                attivoMod.classList.remove('hidden');
+                passivoMod.classList.add('hidden');
+
+                attivoBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-emerald-600 text-white shadow-md";
+                passivoBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-slate-200 transition-all duration-200";
+            }
+        }
+
+        // MODULE 1: STEPPER RENDERER & NAVIGATION
+        function selectPassivoStep(stepNum) {
+            passivoCurrentStep = stepNum;
+            renderPassivoStep(stepNum);
+        }
+
+        function navigatePassivo(direction) {
+            passivoCurrentStep += direction;
+            if (passivoCurrentStep < 1) passivoCurrentStep = 1;
+            if (passivoCurrentStep > 7) passivoCurrentStep = 7;
+            renderPassivoStep(passivoCurrentStep);
+        }
+
+        function renderPassivoStep(stepNum) {
+            // Update Stepper UI styles
+            for (let i = 1; i <= 7; i++) {
+                const btn = document.getElementById(`pstep-${i}`);
+                if (i === stepNum) {
+                    btn.className = "step-active flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500 shadow-md";
+                } else if (i < stepNum) {
+                    btn.className = "step-completed flex flex-col p-3 rounded-xl border text-left transition-all hover:border-emerald-500";
+                } else {
+                    btn.className = "border-slate-800 bg-slate-900/60 text-slate-400 flex flex-col p-3 rounded-xl border text-left transition-all hover:border-sky-500";
+                }
+            }
+
+            // Render Content
+            const stepData = passivoStepsData[stepNum];
+            const container = document.getElementById('passivo-stage-content');
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-white">${stepData.title}</h2>
+                    <span class="bg-sky-500/10 text-sky-400 border border-sky-500/20 text-xs px-2.5 py-1 rounded-full font-mono">${stepData.badge}</span>
+                </div>
+                ${stepData.content}
+            `;
+
+            document.getElementById('passivo-stage-note').innerText = stepData.note;
+
+            // Update Navigation Buttons State
+            document.getElementById('btn-passivo-prev').disabled = (stepNum === 1);
+            document.getElementById('btn-passivo-next').disabled = (stepNum === 7);
+
+            // Dynamically adjust Budget Chart based on Step Progression
+            updateBudgetChartState(stepNum);
+        }
+
+        // SIMULATOR: FLUSSO COMPLETO ICT
+        function runPassivoSimulation() {
+            let current = 1;
+            const progressContainer = document.getElementById('sim-passivo-progress-container');
+            const progressBar = document.getElementById('sim-passivo-bar');
+            const statusText = document.getElementById('sim-passivo-status-text');
+            const percentageText = document.getElementById('sim-passivo-percentage');
+            const btnSim = document.getElementById('btn-simula-passivo');
+
+            progressContainer.classList.remove('hidden');
+            btnSim.disabled = true;
+
+            clearInterval(passivoSimTimer);
+            passivoSimTimer = setInterval(() => {
+                selectPassivoStep(current);
+                const percent = Math.round((current / 7) * 100);
+                progressBar.style.width = percent + '%';
+                percentageText.innerText = percent + '%';
+                statusText.innerText = `Esecuzione automatica: Fase ${current} di 7 (${passivoStepsData[current].title})`;
+
+                // Add to Audit Log
+                addAuditLog('passivo', `[${new Date().toLocaleTimeString()}] SIMULAZIONE: Avanzamento a Fase ${current} - OK`);
+
+                current++;
+                if (current > 7) {
+                    clearInterval(passivoSimTimer);
+                    statusText.innerText = "Simulazione Flusso Completo ICT completata con successo!";
+                    btnSim.disabled = false;
+                }
+            }, 1800);
+        }
+
+        function resetPassivoState() {
+            clearInterval(passivoSimTimer);
+            document.getElementById('sim-passivo-progress-container').classList.add('hidden');
+            document.getElementById('btn-simula-passivo').disabled = false;
+            selectPassivoStep(1);
+            addAuditLog('passivo', `[${new Date().toLocaleTimeString()}] SYSTEM: Reset dello stato simulazione ICT effettuato.`);
+        }
+
+        // MODULE 2: DEMO GUIDATA 5 MINUTI PRA/PAGOPA
+        function startPagoPADemo() {
+            const banner = document.getElementById('demo-attivo-banner');
+            const stepText = document.getElementById('demo-attivo-step-text');
+            const stepNum = document.getElementById('demo-attivo-step-num');
+            banner.classList.remove('hidden');
+
+            let stage = 1;
+            clearInterval(attivoDemoTimer);
+
+            const demoStages = [
+                "Fase 1: Acquisizione Flusso RT XML da Nodo PagoPA & Decodifica IUV...",
+                "Fase 2: Esecuzione Engine di Riconciliazione Automatica con Sospesi SIOPE+...",
+                "Fase 3: Ripartizione Automatica Spettanze (PRA, Bollo, Provincia) & Generazione OPI..."
+            ];
+
+            const runStep = () => {
+                stepNum.innerText = stage;
+                stepText.innerText = demoStages[stage - 1];
+
+                if (stage === 1) {
+                    addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] DEMO: Importazione 1.240 RT XML completata.`);
+                } else if (stage === 2) {
+                    runAutoReconciliation();
+                    addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] DEMO: Riconciliazione automatica eseguita. Successo 98%.`);
+                } else if (stage === 3) {
+                    generateDistintaRiversamento();
+                    addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] DEMO: Flusso OPI Riversamento Banca Tesoriera pronto.`);
+                }
+
+                stage++;
+                if (stage > 3) {
+                    clearInterval(attivoDemoTimer);
+                    setTimeout(() => {
+                        stepText.innerText = "Demo guidata completata con successo!";
+                    }, 2000);
+                }
+            };
+
+            runStep();
+            attivoDemoTimer = setInterval(runStep, 3000);
+        }
+
+        function resetAttivoState() {
+            clearInterval(attivoDemoTimer);
+            document.getElementById('demo-attivo-banner').classList.add('hidden');
+            renderPagoPATable();
+            addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] SYSTEM: Reset stato PagoPA/PRA effettuato.`);
+        }
+
+        // TABLE RENDERER & RECONCILIATION ENGINE
+        function renderPagoPATable() {
+            const tbody = document.getElementById('pagopa-table-body');
+            tbody.innerHTML = pagopaRows.map(row => `
+                <tr class="hover:bg-slate-900/40 transition">
+                    <td class="py-3 px-3 font-mono font-semibold text-slate-200">${row.id}</td>
+                    <td class="py-3 px-3 text-slate-300">${row.causale}</td>
+                    <td class="py-3 px-3 text-right font-mono font-bold text-white">€ ${row.importo.toFixed(2)}</td>
+                    <td class="py-3 px-3 font-mono text-slate-400">${row.sospeso}</td>
+                    <td class="py-3 px-3">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold border ${row.badgeClass}">${row.status}</span>
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        <button onclick="resolveRow('${row.id}')" class="text-xs text-sky-400 hover:text-sky-300 transition">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Match
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterPagoPATable() {
+            const query = document.getElementById('pagopa-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#pagopa-table-body tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        function runAutoReconciliation() {
+            pagopaRows.forEach(row => {
+                row.status = "Riconciliato";
+                row.badgeClass = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+            });
+            renderPagoPATable();
+            addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] RECONCILER: Riconciliazione massiva completata su tutti gli IUV.`);
+        }
+
+        function resolveRow(id) {
+            const item = pagopaRows.find(r => r.id === id);
+            if (item) {
+                item.status = "Riconciliato";
+                item.badgeClass = "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+                renderPagoPATable();
+                addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] RECONCILER: Risolta anomalia per ${id}`);
+            }
+        }
+
+        function generateDistintaRiversamento() {
+            addAuditLog('attivo', `[${new Date().toLocaleTimeString()}] RIVERSAMENTO: Generata Distinta OPI DIST-PRA-2026-092 per € 100.000,00`);
+            alert("Distinta di Riversamento OPI ed Elenco Sospesi generati correttamente con firma digitale!");
+        }
+
+        // AUDIT TRAIL LOGGING HELPER
+        function addAuditLog(module, message) {
+            const logId = module === 'passivo' ? 'passivo-audit-log' : 'attivo-audit-log';
+            const container = document.getElementById(logId);
+            if (container) {
+                const div = document.createElement('div');
+                div.className = module === 'passivo' ? 'text-sky-300' : 'text-emerald-300';
+                div.innerText = message;
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        // Dynamic Chart Updates
+        function initBudgetChart() {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            budgetChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Budget Iniziale', 'Impegnato', 'Liquidato', 'Forecast Rem.'],
+                    datasets: [{
+                        data: [1200000, 450000, 0, 750000],
+                        backgroundColor: ['#0284c7', '#38bdf8', '#059669', '#d97706'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { color: '#334155' } }
+                    }
+                }
+            });
+        }
+
+        function updateBudgetChartState(stepNum) {
+            if (!budgetChartInstance) return;
+            let liquidato = 0;
+            let impegnato = 450000;
+
+            if (stepNum >= 5) {
+                liquidato = 183000; // Step 5 Pagamento
+            }
+
+            document.getElementById('kpi-budget-liquidato').innerText = `€ ${liquidato.toLocaleString('it-IT')}`;
+            budgetChartInstance.data.datasets[0].data = [1200000, impegnato, liquidato, 1200000 - impegnato];
+            budgetChartInstance.update();
+        }
+
+        function initSplitChart() {
+            const ctx = document.getElementById('splitChart').getContext('2d');
+            splitChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Quota PRA (ACI)', 'Erario (Bollo)', 'Provincia (IPT)', 'Spettanza Ente'],
+                    datasets: [{
+                        data: [27000, 32000, 25000, 16000],
+                        backgroundColor: ['#7c3aed', '#3b82f6', '#059669', '#d97706'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#94a3b8', font: { size: 11 } }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // XML MODAL INSPECTOR LOGIC
+        function openXmlModal(type) {
+            const modal = document.getElementById('xml-modal');
+            const title = document.getElementById('xml-modal-title');
+            const filename = document.getElementById('xml-modal-filename');
+            const code = document.getElementById('xml-modal-code');
+
+            if (type === 'passivo') {
+                title.innerText = "Ispezione Tracciato FatturaPA & OPI ICT";
+                filename.innerText = "FatturaPA_ICT_9823741AB4.xml";
+                code.innerText = `<?xml version="1.0" encoding="UTF-8"?>
+<p:FatturaElettronica versione="FPA12" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
+  <FatturaElettronicaHeader>
+    <DatiTrasmissione>
+      <ProgressivoInvio>992831</ProgressivoInvio>
+      <CodiceDestinatario>UF923A</CodiceDestinatario>
+    </DatiTrasmissione>
+    <CedentePrestatore>
+      <DatiAnagrafici>
+        <Anagrafica><Denominazione>TechGov Solutions S.p.A.</Denominazione></Anagrafica>
+      </DatiAnagrafici>
+    </CedentePrestatore>
+  </FatturaElettronicaHeader>
+  <FatturaElettronicaBody>
+    <DatiGenerali>
+      <DatiContratto>
+        <CodiceCIG>9823741AB4</CodiceCIG>
+        <CodiceCUP>F89J23000120001</CodiceCUP>
+      </DatiContratto>
+    </DatiGenerali>
+    <DatiBeniServizi>
+      <DettaglioLinee>
+        <Descrizione>Evoluzione Piattaforma Cloud - SAL 01</Descrizione>
+        <PrezzoTotale>150000.00</PrezzoTotale>
+      </DettaglioLinee>
+    </DatiBeniServizi>
+  </FatturaElettronicaBody>
+</p:FatturaElettronica>`;
+            } else {
+                title.innerText = "Ispezione Flusso Rendicontazione PagoPA (RT)";
+                filename.innerText = "RT_FLUSSO_PAGOPA_20261005.xml";
+                code.innerText = `<?xml version="1.0" encoding="UTF-8"?>
+<FlussoRendicontazione xmlns="http://www.digitpa.gov.it/schemas/2011/Pagamenti/">
+  <identificativoFlusso>2026-10-05ACI-001</identificativoFlusso>
+  <dataOraFlusso>2026-10-05T10:30:00</dataOraFlusso>
+  <IstitutoEmittente>
+    <identificativoUnivocoPagatore>9910283001</identificativoUnivocoPagatore>
+  </IstitutoEmittente>
+  <DatiSingoloPagamento>
+    <singoloImportoPagato>250.00</singoloImportoPagato>
+    <esitoSingoloPagamento>PAGATO</esitoSingoloPagamento>
+    <identificativoUnivocoRiscossione>IUV-2026-009128</identificativoUnivocoRiscossione>
+    <causaleVersamento>Diritti PRA - Trasferimento Proprietà</causaleVersamento>
+  </DatiSingoloPagamento>
+</FlussoRendicontazione>`;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeXmlModal() {
+            document.getElementById('xml-modal').classList.add('hidden');
+        }
+
+        function copyXmlContent() {
+            const codeText = document.getElementById('xml-modal-code').innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = codeText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert("Tracciato XML copiato negli appunti!");
+        }
+    </script>
+</body>
+</html>
